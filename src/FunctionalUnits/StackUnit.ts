@@ -7,8 +7,8 @@ export const StackUnit = (subname?: string) => {
     subname,
     reset: () => (stack = []),
     ports: [
-      { name: "PUSH", write: (val) => stack.push(val) },
-      { name: "POP", read: () => stack.pop() ?? 0 },
+      { name: () => "PUSH", write: (val) => stack.push(val) },
+      { name: () => "POP", read: () => stack.pop() ?? 0 },
     ],
   });
 };

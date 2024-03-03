@@ -11,10 +11,10 @@ export type ExtractedReturnTypes<T> = {
 };
 
 export interface Port {
-  name: string;
+  name: () => string;
   read?: () => number;
   write?: (val: number) => void;
-  inhibitRead?: boolean;
+  inhibitRead?: () => boolean;
 }
 
 export type Instruction = [string, string];

@@ -8,9 +8,9 @@ export const MemoryUnit = (subname?: string) => {
     subname,
     reset: () => (memory = []),
     ports: [
-      { name: "ADDRESS", write: (val) => (address = val) },
+      { name: () => "ADDRESS", write: (val) => (address = val) },
       {
-        name: "DATA",
+        name: () => "DATA",
         write: (val) => (memory[address] = val),
         read: () => memory[address] ?? 0,
       },

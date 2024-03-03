@@ -12,14 +12,14 @@ export const PCUnit = (subname?: string) => {
       branchTarget = 0;
     },
     ports: [
-      { name: "PC", write: (val) => (pc = val), read: () => pc },
+      { name: () => "PC", write: (val) => (pc = val), read: () => pc },
       {
-        name: "TARGET",
+        name: () => "TARGET",
         write: (val) => (branchTarget = val),
         read: () => branchTarget,
       },
       {
-        name: "BRANCH",
+        name: () => "BRANCH",
         write: (val) => {
           if (val & 0x1) {
             pc = branchTarget;

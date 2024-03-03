@@ -17,7 +17,7 @@ const computer = (...functionalUnits: FunctionalUnit[]) => {
     .flat();
 
   let microcode: (() => void)[] = [];
-  return dispatch({
+  return dispatch({}, {
     reset: () => functionalUnits.map((fu) => fu("reset")),
     cycle: () => {
       const pc = ports[0]("read");
@@ -31,6 +31,7 @@ const computer = (...functionalUnits: FunctionalUnit[]) => {
         ([destination, source]: Instruction) => {
           const sourceIndex = registers.indexOf(source);
           const destinationIndex = registers.indexOf(destination);
+          console.log(`sourceIndex: ${sourceIndex}, destinationIndex: ${destinationIndex}`)
           return ports[destinationIndex]("inhibitRead")
             ? () =>
                 ports[destinationIndex]("write", Number.parseInt(source, 16))
@@ -60,6 +61,8 @@ const c = computer(
   MemoryUnit(),
   DebugIOUnit(),
 );
+
+console.log(c('registers'));
 
 c("load", [
   ...load(6),

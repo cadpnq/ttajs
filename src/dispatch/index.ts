@@ -1,33 +1,38 @@
 import type { ExtractedReturnTypes, OptionalValues } from "../types";
 
 export const dispatch =
-  <T extends Record<string, (...args: any[]) => any>>(methods: T) =>
+  <T extends Slots>(defaults: OptionalProperties<T>, slots: T) =>
   <K extends keyof T>(
-    method: K,
+    slot: K,
     ...args: Parameters<T[K]>
-  ): ReturnType<T[K]> => {
-    if (methods[method] !== undefined) {
-      return methods[method](...args) as ReturnType<T[K]>;
+  ): StrictReturnType<T[K]> => {
+    const d = (defaults as Partial<T>)[slot];
+    const s = slots[slot];
+    if (typeof s === "function") {
+      return s(...args);
+    } else if (typeof d === "function") {
+      return d(...args);
     }
-    throw new Error(`Method '${method.toString()}' not found`);
+    throw new Error(`Unknown slot: ${slot.toString()}`);
   };
 
-export const indexedDispatch = <T extends Record<string, any>>(
-  defaults: ExtractedReturnTypes<OptionalValues<T>>,
+export const indexedDispatch = <T extends Slots>(
+  defaults: FirstArgumentType<typeof dispatch<T>>,
   objects: T[]
 ) => {
-  if (objects.length === 0) throw new Error("must have objects to index");
+  if (objects.length === 0) {
+    throw new Error("must have objects to index");
+  }
+  const dispatchers = objects.map((o) => dispatch(defaults, o));
   return <K extends keyof T>(
-    method: K,
+    slot: K,
     index: number,
-    ...args: NonNullable<T[K]> extends Function ? Parameters<T[K]> : never[]
-  ): NonNullable<T[K]> extends (...args: any[]) => infer R ? R : T[K] => {
-    if (objects[index]?.[method] === undefined) {
-      return (defaults as Partial<T>)[method] as T[K];
+    ...args: Parameters<T[K]>
+  ) => {
+    const d = dispatchers[index];
+    if (d === undefined) {
+      throw new Error("inalid dispatch index");
     }
-    if (typeof objects[index]?.[method] === "function") {
-      return objects[index][method](...args) as ReturnType<T[K]>;
-    }
-    return objects[index]?.[method];
+    return d(slot, ...args);
   };
 };
