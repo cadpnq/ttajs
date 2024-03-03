@@ -1,4 +1,13 @@
-import { ALU, DebugIOUnit, FunctionalUnit, ImmediateUnit, MemoryUnit, PCUnit, RegisterUnit, StackUnit } from "./FunctionalUnits";
+import {
+  ALU,
+  DebugIOUnit,
+  FunctionalUnit,
+  ImmediateUnit,
+  MemoryUnit,
+  PCUnit,
+  RegisterUnit,
+  StackUnit,
+} from "./FunctionalUnits";
 import { dispatch } from "./dispatch";
 import { Instruction } from "./types";
 
@@ -11,44 +20,47 @@ const computer = (...functionalUnits: FunctionalUnit[]) => {
       fu.map(
         (f, index) =>
           (method: string, ...args: any[]) =>
-            f(method, index, ...args),
-      ),
+            f(method, index, ...args)
+      )
     )
     .flat();
 
   let microcode: (() => void)[] = [];
-  return dispatch({}, {
-    reset: () => functionalUnits.map((fu) => fu("reset")),
-    cycle: () => {
-      const pc = ports[0]("read");
-      ports[0]("write", pc + 1);
-      microcode[pc]();
-    },
-    registers: () => registers,
-    microcode: () => microcode,
-    load: (instructions: Instruction[]) => {
-      microcode = instructions.map(
-        ([destination, source]: Instruction) => {
+  return dispatch(
+    {},
+    {
+      reset: () => functionalUnits.map((fu) => fu("reset")),
+      cycle: () => {
+        const pc = ports[0]("read");
+        ports[0]("write", pc + 1);
+        microcode[pc]();
+      },
+      registers: () => registers,
+      microcode: () => microcode,
+      load: (instructions: Instruction[]) => {
+        microcode = instructions.map(([destination, source]: Instruction) => {
           const sourceIndex = registers.indexOf(source);
           const destinationIndex = registers.indexOf(destination);
-          console.log(`sourceIndex: ${sourceIndex}, destinationIndex: ${destinationIndex}`)
+          console.log(
+            `sourceIndex: ${sourceIndex}, destinationIndex: ${destinationIndex}`
+          );
           return ports[destinationIndex]("inhibitRead")
             ? () =>
                 ports[destinationIndex]("write", Number.parseInt(source, 16))
             : () =>
                 ports[destinationIndex]("write", ports[sourceIndex]("read"));
-        },
-      );
-    },
-  });
+        });
+      },
+    }
+  );
 };
 
 const load = (val: number): Instruction[] => {
   return [
     ["IMM_LOW", (val & 0x0000ffff).toString(16)],
-    ...(val & 0xffff0000
+    ...((val & 0xffff0000
       ? [["IMM_HIGH", (val & 0xffff0000).toString(16)]]
-      : []) as Instruction[],
+      : []) as Instruction[]),
   ];
 };
 
@@ -59,10 +71,10 @@ const c = computer(
   StackUnit(),
   ALU(),
   MemoryUnit(),
-  DebugIOUnit(),
+  DebugIOUnit()
 );
 
-console.log(c('registers'));
+console.log(c("registers"));
 
 c("load", [
   ...load(6),
@@ -81,8 +93,8 @@ c("load", [
   ["ADDR_BRANCH", "IMM_VALUE"],
 ]);
 
-console.time('cycle');
+console.time("cycle");
 for (let i = 0; i < 400; i++) {
   c("cycle");
 }
-console.timeEnd('cycle');
+console.timeEnd("cycle");

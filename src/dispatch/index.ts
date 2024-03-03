@@ -1,4 +1,6 @@
-import type { ExtractedReturnTypes, OptionalValues } from "../types";
+import type { FirstArgumentType, OptionalProperties, StrictReturnType } from "../types";
+
+export type Slots = Record<string, any>;
 
 export const dispatch =
   <T extends Slots>(defaults: OptionalProperties<T>, slots: T) =>
