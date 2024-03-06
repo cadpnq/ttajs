@@ -11,22 +11,22 @@ export const ImmediateUnit = (subname?: string) => {
     },
     ports: [
       {
-        name: () => "HIGH",
+        name: "HIGH",
         write: (val) => {
           value &= 0x0000ffff;
           value |= (val & 0xffff0000) << 16;
         },
-        inhibitRead: () => true,
+        inhibitRead: true,
       },
       {
-        name: () => "LOW",
+        name: "LOW",
         write: (val) => {
           value &= 0xffff0000;
           value |= val & 0x0000ffff;
         },
-        inhibitRead: () => true,
+        inhibitRead: true,
       },
-      { name: () => "VALUE", read: () => value },
+      { name: "VALUE", read: () => value },
     ],
   });
 };

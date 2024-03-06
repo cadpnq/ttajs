@@ -5,6 +5,8 @@ export const DebugIOUnit = (subname?: string) => {
     basename: "DEBUG",
     subname,
     reset: () => {},
-    ports: [{ name: () => "LOG", write: (val) => console.log(val) }],
+    ports: [{ name: "LOG", write: (val) => 0
+    //console.log(val) 
+    }],
   });
 };

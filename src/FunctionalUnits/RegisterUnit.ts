@@ -6,7 +6,7 @@ export const RegisterUnit = (count: number, subname?: string) => {
   const ports: Port[] = Array(count)
     .fill({})
     .map((_, index) => ({
-      name: () => index.toString(),
+      name: index.toString(),
       read: () => registers[index] ?? 0,
       write: (val) => (registers[index] = val),
     }));

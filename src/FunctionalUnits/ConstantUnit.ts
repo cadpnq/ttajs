@@ -5,7 +5,7 @@ export const ConstantUnit = (values: number[], subname?: string) => {
   const ports: Port[] = Array(values.length)
     .fill({})
     .map((_, index) => ({
-      name: () => values[index].toString(),
+      name: values[index].toString(),
       read: () => values[index] ?? 0,
     }));
   return functionalUnit({
